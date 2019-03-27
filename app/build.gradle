@@ -1,0 +1,353 @@
+apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-android-extensions'
+
+apply plugin: 'walle'
+//apply plugin: TaskPlugin
+
+
+
+android {
+    signingConfigs {
+        release {
+            keyAlias 'job'
+            keyPassword '123456'
+            storeFile file('/Users/wuliangliang/AndroidProjects/Job/app/job')
+            storePassword '123456'
+            v2SigningEnabled true
+        }
+    }
+    compileSdkVersion 28
+    defaultConfig {
+        applicationId "com.alex.kotlin.job"
+        minSdkVersion 21
+        targetSdkVersion 28
+
+        versionCode 1
+        versionName "1.0"
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig null
+        }
+        debug {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig null
+            ext.enableCrashlytics = false
+        }
+    }
+
+    dexOptions {
+        preDexLibraries true
+        maxProcessCount 8
+        javaMaxHeapSize "2g"
+    }
+
+    flavorDimensions "model", "api"
+
+    productFlavors {
+        pay {
+            applicationIdSuffix '.pay'
+            versionCode 1
+            versionName "1.0.0.pay"
+            dimension "model"
+            signingConfig = signingConfigs.release
+            buildConfigField "String", "model", '"pay"'
+            manifestPlaceholders = [
+                    "flavors": "pay"
+            ]
+        }
+        inner {
+            applicationIdSuffix '.inner'
+            versionCode 1
+            versionName "1.0.0.inner"
+            dimension "model"
+            signingConfig = signingConfigs.release
+            buildConfigField "String", "model", '"inner"'
+            manifestPlaceholders = [
+                    "flavors": "inner"
+            ]
+        }
+        free {
+            applicationIdSuffix '.free'
+            versionCode 1
+            versionName "1.0.0.free"
+            dimension "model"
+            signingConfig = signingConfigs.release
+            buildConfigField "String", "model", '"free"'
+            manifestPlaceholders = [
+                    "flavors": "free"
+            ]
+        }
+        simple {
+            applicationIdSuffix '.simple'
+            versionCode 1
+            versionName "1.0.0.simple"
+            dimension "api"
+            signingConfig = signingConfigs.release
+            buildConfigField "String", "model", '"simple"'
+            manifestPlaceholders = [
+                    "flavors": "simple"
+            ]
+        }
+    }
+
+    variantFilter { variant ->
+        def name = variant.flavors*.name
+        if (name.contains("pay") && name.contains("simple")) {
+            setIgnore(true)
+        }
+    }
+
+    sourceSets {
+        innerSimple {
+            java.srcDirs = ['src/innerSimple/java', 'src/innerSimple/java/']
+            res.srcDirs = ['src/innerSimple/res', 'src/innerSimple/res/']
+            manifest.srcFile 'src/innerSimple/AndroidManist.xml'
+        }
+        freeSimple {
+            java.srcDirs = ['src/freeSimple/java', 'src/freeSimple/java/']
+        }
+    }
+
+//    splits {
+//        density {
+//            enable true
+//            reset()
+//            include "ldpi", "xxhdpi"
+//            exclude "ldpi"
+//            compatibleScreens 'small', 'large', 'normal'
+//        }
+//        abi {
+//            enable true
+//            reset()
+//            include "x86"
+//        }
+//    }
+
+}
+
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:$kotlin_version"
+    implementation 'com.android.support:appcompat-v7:28.0.0'
+    implementation 'android.arch.navigation:navigation-fragment:1.0.0-alpha07'
+    implementation 'android.arch.navigation:navigation-ui:1.0.0-alpha07'
+    implementation 'android.arch.navigation:navigation-fragment-ktx:1.0.0-alpha07'
+    implementation 'android.arch.navigation:navigation-ui-ktx:1.0.0-alpha07'
+    implementation 'com.android.support:design:28.0.0'
+    implementation 'com.android.support.constraint:constraint-layout:1.1.3'
+    implementation 'com.android.support:support-v4:28.0.0'
+    implementation 'com.android.support:recyclerview-v7:28.0.0'
+    testImplementation 'junit:junit:4.12'
+    androidTestImplementation 'com.android.support.test:runner:1.0.2'
+    androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
+    implementation 'com.meituan.android.walle:library:1.1.6'
+    implementation 'com.github.bumptech.glide:glide:4.8.0'
+    annotationProcessor 'com.github.bumptech.glide:compiler:4.8.0'
+
+
+}
+
+walle {
+    // 指定渠道包的输出路径
+    apkOutputFolder = new File("${project.buildDir}/outputs/channels")
+    // 定制渠道包的APK的文件名称
+    apkFileNameFormat = '${appName}-${packageName}-${channel}-${buildType}-v${versionName}-${versionCode}-${buildTime}.apk';
+    // 渠道配置文件
+    channelFile = project.rootProject.file("channels.txt")
+}
+
+//task hello {
+//
+//    //自动调整数据类型
+//    def a = 100
+//    def c = 1000000000000
+//    assert a instanceof Integer
+//    assert c instanceof Long
+//
+//    //利用后缀声明类型
+////    - Integer 使用I或i
+////    - Long 使用L或l
+////    - BigInteger 使用G或g
+////    - BigDecimal 使用G或g
+////    - Double 使用D或d
+////    - Float 使用F或f
+//
+//
+//    println "say hello"
+//    doFirst {
+//        println "say hello doFirst"
+//    }
+//    doLast {
+//        println "say hello doLast"
+//    }
+////    haveFun()
+//}
+
+def haveFun() {
+    helloP "HELLO"
+    println "List-------------------"
+    //list
+    def list = [100, "A", 200]
+    list[1] = 500
+    println list[0]
+    println list[1]
+    println list.size()
+    list << 500
+    println list.size()
+    println list[3]
+    println "List 的方法-------------------"
+    list.addAll(1, [2, 3, 4])
+    println "删除之前的Size = ${list.size()}  首部为 ${list[0]}"
+    println "删除之前的尾部为 ${list[list.size() - 1]}"
+    list.drop(2)   //不起作用？
+    println "头部删除后的Size = ${list.size()} 首部为 ${list[0]}"
+    list.dropRight(2)   //不起作用？
+    println "删除之前的尾部为 ${list[list.size() - 1]}"
+    //List的遍历
+    list.each {
+        println "$it"
+    }
+    //Map
+    println "Map-------------------"
+    def map = ["id": 1, "name": "user", "age": 20]
+    map["id"] = 5
+    // .id 和 [id] 两者用法相同
+    println map["id"]
+    println map.id
+    map.id = 100
+    println map["id"]
+    println map.id
+    println map.age
+    println "Map的遍历-------------------"
+    map.each { key, value ->
+        println "key = $key value = $value"
+    }
+    println "-------------------------"
+    map.each { entry ->
+        println "key = ${entry.key} value = ${entry.value}"
+    }
+    println "eachWithIndex-------------------------"
+    map.eachWithIndex { Map.Entry<String, Serializable> entry, int i ->
+        println "key = ${entry.key} value = ${entry.value} index = $i"
+    }
+    println "-------------------------"
+    map.eachWithIndex { key, value, index ->
+        println "key = ${key} value = ${value} index = $index"
+    }
+    println "-------------------------"
+    map.count {
+        println it  //直接输出map
+    }
+    //IO
+    println "IO-----IO------IO-------IO-------IO"
+    def file = project.file("test.txt")
+    file.eachLine {  //设置解码格式 file.eachLine（'UTF-8'）{...}
+        println "$it"
+    }
+    println "-------------------------"
+    file.eachLine { line, lineNo ->
+        println "$lineNo $line"
+    }
+
+//    println file.getBytes().toString()
+//    println file.getText() //获取所有Text
+//    file << Byte.valueOf("0000000")
+//    //将一个文件写入另一个文件
+//    def data = project.rootProject.file("channels.txt").newDataInputStream()
+//    file << data
+//    println file.getText()
+
+    def fileXml = project.file("src/main/res/layout/test.xml")
+    def xml = new XmlParser().parse(fileXml)
+    //println xml['Button']//
+
+    //Class----------------------------
+    def book = new Book()
+    book.with {
+        name = "BOOK"
+        price = 100
+    }
+
+    println book.name
+    println book.price
+
+    def a = new Book.A()
+    a.desc = "A in Book"
+    println a.desc
+
+    //Kotlin 三元运算 和 非空 ?.
+    def x = "C"
+    switch (x) {
+        case 100:
+            println " x = ${x}"
+            break
+    //Range
+        case 10..50:
+            println " x = ${x} in 10 .. 50"
+            break
+        case [60, 70, 80]:
+            println " x = ${x} in Array"
+            break
+        case "A":
+            println " x = ${x}"
+            break
+        case ["B", "C", "D"]:
+            println " x = ${x} in BCD"
+            break
+        case 100.1:
+            println " x = ${x}"
+            break
+    }
+
+    //闭包
+//    def closure = {
+//        param -> println param
+//    }
+
+//    closure "This is closure!"
+//    closure.call("This is closure by call!")
+
+//    def closure = {y,z ->
+//        println " y + z = ${y+z}"
+//    }
+//    closure 10,20
+
+    eachList(["4", "5", "6"], { println it })
+    eachList(["7", "8", "9"]) { println it }  //大括号可以放在外面
+
+
+}
+
+class Book {
+    String name
+    float price
+
+    static class A {
+        String desc
+    }
+}
+
+def helloP(msg) {
+    println "msg = ${msg}"
+}
+
+def eachList(list, closure) {
+    for (string in list) {
+        closure string
+    }
+}
+
+class TaskPlugin implements Plugin<Project> {
+
+    @Override
+    void apply(Project target) {
+        println "-----------------------------------"
+        println "This is taskPlugin in build.gradle!"
+    }
+}

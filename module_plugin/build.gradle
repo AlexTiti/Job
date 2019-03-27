@@ -1,0 +1,19 @@
+apply plugin: 'groovy'
+apply plugin: 'maven'
+
+dependencies{
+    implementation gradleApi()
+    implementation localGroovy()
+}
+
+group = 'com.alex.plugin'
+version = '1.0.0'
+archivesBaseName = 'module_plugin'
+
+uploadArchives{  //方法名必须是这个
+    repositories{
+        mavenDeployer{
+            repository(url:uri("../testModulePlugin"))
+        }
+    }
+}
